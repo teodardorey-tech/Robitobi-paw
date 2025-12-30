@@ -1,0 +1,15 @@
+{
+  "name": "RobiTobi",
+  "short_name": "RobiTobi",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0b1020",
+  "icons": [
+    {
+      "src": "robi.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
