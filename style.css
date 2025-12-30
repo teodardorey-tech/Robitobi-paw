@@ -1,0 +1,35 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  height: 100%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+#background {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #cfe9ff 0%, #7bb6ff 40%, #000 70%);
+}
+
+#robi-container {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#robi-face {
+  width: 260px;
+  animation: heartbeat 4s infinite ease-in-out;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.02); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.015); }
+  100% { transform: scale(1); }
+}
