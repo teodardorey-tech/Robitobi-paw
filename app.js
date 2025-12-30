@@ -31,10 +31,6 @@ function resetIdle() {
   startIdle();
 }
 
-document.body.addEventListener("touchstart", resetIdle);
-document.body.addEventListener("click", resetIdle);
-startIdle();
-
 /* =======================
    VOZ - TEXTO A VOZ
 ======================= */
@@ -42,24 +38,20 @@ const synth = window.speechSynthesis;
 let speaking = false;
 
 function speak(text) {
-  if (synth.speaking) synth.cancel();
-
-  stopListening(); // 🔇 pausa micrófono
+  stopListening();
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "es-MX";
   utter.rate = 1;
   utter.pitch = 1.1;
 
-  utter.onstart = () => {
-    speaking = true;
-  };
-
   utter.onend = () => {
     speaking = false;
-    startListening(); // 🎧 reactiva micrófono
+    startListening();
   };
 
+  speaking = true;
+  synth.cancel();
   synth.speak(utter);
 }
 
@@ -71,7 +63,7 @@ const SpeechRecognition =
 
 const recognition = new SpeechRecognition();
 recognition.lang = "es-MX";
-recognition.continuous = true;
+recognition.continuous = false;
 recognition.interimResults = false;
 
 let listening = false;
@@ -79,29 +71,25 @@ let listening = false;
 function startListening() {
   if (listening) return;
   listening = true;
-  recognition.start();
   face.classList.add("listening");
+  recognition.start();
 }
 
 function stopListening() {
   if (!listening) return;
   listening = false;
-  recognition.stop();
   face.classList.remove("listening");
+  recognition.stop();
 }
 
 recognition.onresult = (event) => {
-  const last = event.results.length - 1;
-  const text = event.results[last][0].transcript.toLowerCase().trim();
-
-  if (!text) return;
-
+  const text = event.results[0][0].transcript.toLowerCase().trim();
   handleCommand(text);
 };
 
 recognition.onerror = () => {
-  stopListening();
-  setTimeout(startListening, 1500);
+  listening = false;
+  face.classList.remove("listening");
 };
 
 /* =======================
@@ -112,27 +100,35 @@ function handleCommand(text) {
 
   if (text.includes("hola")) {
     speak("¡Hola! Soy RobiTobi 😊");
-  } 
+  }
   else if (text.includes("cómo estás")) {
     speak("Muy bien, gracias por preguntar 💙");
-  } 
+  }
   else if (text.includes("tu nombre")) {
     speak("Me llamo RobiTobi 🤖");
-  } 
+  }
   else if (text.includes("duerme")) {
     showSleep();
-  } 
+  }
   else {
-    speak("Te escuché. ¿Qué quieres hacer?");
+    speak("Te escucho. ¿Qué quieres hacer?");
   }
 }
 
 /* =======================
-   INICIO
+   INICIO POR TOQUE
 ======================= */
+document.body.addEventListener("touchstart", () => {
+  resetIdle();
+  startListening();
+});
+
+document.body.addEventListener("click", () => {
+  resetIdle();
+  startListening();
+});
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
-
-startListening();
 
