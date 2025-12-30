@@ -43,13 +43,22 @@ let speaking = false;
 
 function speak(text) {
   if (synth.speaking) synth.cancel();
+
+  stopListening(); // 🔇 pausa micrófono
+
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "es-MX";
   utter.rate = 1;
   utter.pitch = 1.1;
 
-  utter.onstart = () => speaking = true;
-  utter.onend = () => speaking = false;
+  utter.onstart = () => {
+    speaking = true;
+  };
+
+  utter.onend = () => {
+    speaking = false;
+    startListening(); // 🎧 reactiva micrófono
+  };
 
   synth.speak(utter);
 }
@@ -65,49 +74,65 @@ recognition.lang = "es-MX";
 recognition.continuous = true;
 recognition.interimResults = false;
 
-recognition.onstart = () => {
-  face.classList.add("listening");
-};
+let listening = false;
 
-recognition.onend = () => {
-  face.classList.remove("listening");
+function startListening() {
+  if (listening) return;
+  listening = true;
   recognition.start();
-};
+  face.classList.add("listening");
+}
+
+function stopListening() {
+  if (!listening) return;
+  listening = false;
+  recognition.stop();
+  face.classList.remove("listening");
+}
 
 recognition.onresult = (event) => {
   const last = event.results.length - 1;
-  const text = event.results[last][0].transcript.toLowerCase();
+  const text = event.results[last][0].transcript.toLowerCase().trim();
 
-  if (speaking) synth.cancel(); // interrumpe a Robi si hablas
+  if (!text) return;
 
   handleCommand(text);
 };
 
+recognition.onerror = () => {
+  stopListening();
+  setTimeout(startListening, 1500);
+};
+
 /* =======================
-   COMANDOS BÁSICOS
+   COMANDOS
 ======================= */
 function handleCommand(text) {
   resetIdle();
 
   if (text.includes("hola")) {
     speak("¡Hola! Soy RobiTobi 😊");
-  } else if (text.includes("cómo estás")) {
+  } 
+  else if (text.includes("cómo estás")) {
     speak("Muy bien, gracias por preguntar 💙");
-  } else if (text.includes("tu nombre")) {
+  } 
+  else if (text.includes("tu nombre")) {
     speak("Me llamo RobiTobi 🤖");
-  } else if (text.includes("duerme")) {
+  } 
+  else if (text.includes("duerme")) {
     showSleep();
-  } else {
-    speak("Te escucho. ¿Qué quieres hacer?");
+  } 
+  else {
+    speak("Te escuché. ¿Qué quieres hacer?");
   }
 }
 
 /* =======================
-   INICIAR
+   INICIO
 ======================= */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
 
-recognition.start();
+startListening();
 
