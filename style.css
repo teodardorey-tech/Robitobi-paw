@@ -33,3 +33,15 @@ html, body {
   75% { transform: scale(1.015); }
   100% { transform: scale(1); }
 }
+/* Parpadeo */
+@keyframes blink {
+  0%, 95%, 100% { transform: scaleY(1); }
+  97% { transform: scaleY(0.1); }
+}
+
+#robi-face {
+  animation:
+    heartbeat 4s infinite ease-in-out,
+    blink 6s infinite;
+  transform-origin: center;
+}
