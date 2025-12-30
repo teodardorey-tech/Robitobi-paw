@@ -45,3 +45,7 @@ html, body {
     blink 6s infinite;
   transform-origin: center;
 }
+/* Indicador escuchando */
+.listening {
+  box-shadow: 0 0 25px rgba(120,180,255,0.8);
+}
